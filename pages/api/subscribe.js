@@ -1,25 +1,60 @@
-import { createClient } from '@supabase/supabase-js'
+import { useState } from "react";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
+export default function Home() {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
 
-export default async function handler(req, res) {
+  const subscribe = async (e) => {
+    e.preventDefault();
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
+    const res = await fetch("/api/subscribe", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
 
-  const { email } = req.body
+    const data = await res.json();
 
-  const { data, error } = await supabase
-    .from('emails')
-    .insert([{ email }])
+    if (data.success) {
+      setMessage("You are on the waitlist 🚀");
+      setEmail("");
+    } else {
+      setMessage("Error saving email");
+    }
+  };
 
-  if (error) {
-    return res.status(500).json({ error: error.message })
-  }
+  return (
+    <div style={{fontFamily:"Arial", textAlign:"center", padding:"100px"}}>
+      <h1>StudyMind AI</h1>
+      <p>The AI that studies for you</p>
 
-  res.status(200).json({ message: 'Email saved!' })
+      <form onSubmit={subscribe}>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
+          required
+          style={{padding:"10px", width:"250px"}}
+        />
+
+        <button
+          type="submit"
+          style={{
+            padding:"10px 20px",
+            marginLeft:"10px",
+            background:"black",
+            color:"white",
+            border:"none"
+          }}
+        >
+          Join Waitlist
+        </button>
+      </form>
+
+      <p>{message}</p>
+    </div>
+  );
 }

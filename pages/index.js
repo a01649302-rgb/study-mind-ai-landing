@@ -1,12 +1,11 @@
-import { useState } from "react"
+import { useState } from "react";
 
 export default function Home() {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
 
-  const [email, setEmail] = useState("")
-  const [message, setMessage] = useState("")
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const subscribe = async (e) => {
+    e.preventDefault();
 
     const res = await fetch("/api/subscribe", {
       method: "POST",
@@ -14,62 +13,48 @@ export default function Home() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
-    })
+    });
 
-    const data = await res.json()
+    const data = await res.json();
 
-    if (res.ok) {
-      setMessage("✅ Thanks for joining the StudyMind AI waitlist!")
-      setEmail("")
+    if (data.success) {
+      setMessage("You are on the waitlist 🚀");
+      setEmail("");
     } else {
-      setMessage("❌ Something went wrong")
+      setMessage("Error saving email");
     }
-  }
+  };
 
   return (
-    <div style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "100vh",
-      flexDirection: "column",
-      fontFamily: "Arial"
-    }}>
-
+    <div style={{fontFamily:"Arial", textAlign:"center", padding:"100px"}}>
       <h1>StudyMind AI</h1>
+      <p>The AI that studies for you</p>
 
-      <p>The AI that helps you study smarter.</p>
-
-      <form onSubmit={handleSubmit} style={{ marginTop: "20px" }}>
-
+      <form onSubmit={subscribe}>
         <input
           type="email"
           placeholder="Enter your email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e)=>setEmail(e.target.value)}
           required
-          style={{
-            padding: "10px",
-            fontSize: "16px",
-            marginRight: "10px"
-          }}
+          style={{padding:"10px", width:"250px"}}
         />
 
         <button
           type="submit"
           style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            cursor: "pointer"
+            padding:"10px 20px",
+            marginLeft:"10px",
+            background:"black",
+            color:"white",
+            border:"none"
           }}
         >
           Join Waitlist
         </button>
-
       </form>
 
-      {message && <p style={{ marginTop: "20px" }}>{message}</p>}
-
+      <p>{message}</p>
     </div>
-  )
+  );
 }
