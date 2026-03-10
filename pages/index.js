@@ -2,102 +2,74 @@ import { useState } from "react"
 
 export default function Home() {
 
-const [email,setEmail] = useState("")
-const [message,setMessage] = useState("")
+  const [email, setEmail] = useState("")
+  const [message, setMessage] = useState("")
 
-async function saveEmail(){
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
-const res = await fetch("/api/saveEmail",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({email})
-})
+    const res = await fetch("/api/subscribe", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    })
 
-const data = await res.json()
-setMessage(data.message)
+    const data = await res.json()
 
-}
+    if (res.ok) {
+      setMessage("✅ Thanks for joining the StudyMind AI waitlist!")
+      setEmail("")
+    } else {
+      setMessage("❌ Something went wrong")
+    }
+  }
 
-return (
+  return (
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+      flexDirection: "column",
+      fontFamily: "Arial"
+    }}>
 
-<div style={{
-fontFamily:"Arial",
-padding:"40px",
-textAlign:"center"
-}}>
+      <h1>StudyMind AI</h1>
 
-<h1 style={{fontSize:"48px"}}>
-Study Mind AI
-</h1>
+      <p>The AI that helps you study smarter.</p>
 
-<p style={{fontSize:"20px"}}>
-La plataforma que te ayuda a estudiar usando inteligencia artificial
-</p>
+      <form onSubmit={handleSubmit} style={{ marginTop: "20px" }}>
 
-<h2>
-Tres capacidades principales
-</h2>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{
+            padding: "10px",
+            fontSize: "16px",
+            marginRight: "10px"
+          }}
+        />
 
-<div style={{
-display:"flex",
-justifyContent:"center",
-gap:"40px",
-marginTop:"40px"
-}}>
+        <button
+          type="submit"
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            cursor: "pointer"
+          }}
+        >
+          Join Waitlist
+        </button>
 
-<div>
-<h3>Resúmenes AI</h3>
-<p>Convierte textos largos en resúmenes claros</p>
-</div>
+      </form>
 
-<div>
-<h3>Plan de estudio</h3>
-<p>Organiza tus materias automáticamente</p>
-</div>
+      {message && <p style={{ marginTop: "20px" }}>{message}</p>}
 
-<div>
-<h3>Práctica inteligente</h3>
-<p>Genera quizzes con inteligencia artificial</p>
-</div>
-
-</div>
-
-<div style={{marginTop:"60px"}}>
-
-<h2>Únete a la lista de espera</h2>
-
-<input
-placeholder="tu email"
-value={email}
-onChange={(e)=>setEmail(e.target.value)}
-style={{
-padding:"10px",
-fontSize:"18px",
-width:"300px"
-}}
-/>
-
-<br/><br/>
-
-<button
-onClick={saveEmail}
-style={{
-padding:"10px 30px",
-fontSize:"18px",
-backgroundColor:"black",
-color:"white"
-}}
->
-Unirme
-</button>
-
-<p>{message}</p>
-
-</div>
-
-</div>
-
-)
+    </div>
+  )
 }
