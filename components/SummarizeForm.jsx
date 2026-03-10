@@ -25,13 +25,23 @@ export default function SummarizeForm() {
 
   return (
     <div className="glass-card" style={{ padding: "32px", width: "100%", maxWidth: "800px", textAlign: "left" }}>
-      <h2 style={{ fontSize: "24px", fontWeight: "700", marginBottom: "16px" }}>📝 Resumidor de Texto</h2>
-      <p style={{ color: "var(--text-muted)", marginBottom: "20px" }}>Pega tus apuntes o párrafos largos para obtener un resumen estructurado.</p>
+      <h2 style={{ fontSize: "24px", fontWeight: "700", marginBottom: "12px" }}>📝 Resumidor de Texto</h2>
+      <p style={{ color: "var(--text-muted)", marginBottom: "24px" }}>Pega notas sueltas, artículos o párrafos para obtener un análisis rápido.</p>
 
       <textarea
         rows="8"
-        style={{ width: "100%", marginBottom: "20px", resize: "none" }}
-        placeholder="Pega tus notas aquí..."
+        style={{
+          width: "100%",
+          marginBottom: "24px",
+          resize: "none",
+          padding: '20px',
+          background: 'rgba(0,0,0,0.3)',
+          border: '1px solid var(--card-border)',
+          borderRadius: '16px',
+          color: 'white',
+          fontSize: '16px'
+        }}
+        placeholder="Escribe o pega tus apuntes aquí..."
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
@@ -43,20 +53,30 @@ export default function SummarizeForm() {
           background: "white",
           color: "black",
           border: "none",
-          padding: "12px 28px",
+          padding: "16px 28px",
           borderRadius: "12px",
-          fontWeight: "600",
+          fontWeight: "700",
           width: "100%",
-          display: "block"
+          fontSize: '16px',
+          transition: 'all 0.2s ease'
         }}
       >
-        {loading ? "Procesando..." : "Resumir Notas"}
+        {loading ? "Analizando..." : "Generar Resumen"}
       </button>
 
       {summary && (
-        <div style={{ marginTop: "32px", padding: "24px", background: "rgba(255,255,255,0.03)", borderRadius: "16px", border: "1px solid var(--card-border)" }}>
-          <h3 style={{ fontSize: "18px", fontWeight: "600", marginBottom: "12px", color: "var(--primary)" }}>Resumen Generado:</h3>
-          <p style={{ whiteSpace: "pre-wrap", color: "var(--text-main)" }}>{summary}</p>
+        <div style={{ marginTop: "32px", animation: "fadeIn 0.5s ease" }}>
+          <h3 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "12px", color: "var(--primary)" }}>Resumen AI:</h3>
+          <div style={{
+            padding: "24px",
+            background: "rgba(255,255,255,0.03)",
+            borderRadius: "16px",
+            border: "1px solid var(--card-border)",
+            lineHeight: '1.7',
+            color: '#cbd5e1'
+          }}>
+            {summary}
+          </div>
         </div>
       )}
     </div>

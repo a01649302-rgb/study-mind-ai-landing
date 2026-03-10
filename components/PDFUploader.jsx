@@ -1,6 +1,28 @@
 // components/PDFUploader.jsx
 import { useState } from "react";
 
+function Flashcard({ question, answer }) {
+  const [flipped, setFlipped] = useState(false);
+  return (
+    <div
+      className={`flashcard-container ${flipped ? 'flipped' : ''}`}
+      onClick={() => setFlipped(!flipped)}
+    >
+      <div className="flashcard-inner">
+        <div className="flashcard-front">
+          <span className="category-badge">Pregunta</span>
+          <p style={{ fontWeight: "600", fontSize: "18px" }}>{question}</p>
+          <p style={{ marginTop: "20px", fontSize: "12px", color: "var(--text-muted)" }}>Haz click para ver la respuesta</p>
+        </div>
+        <div className="flashcard-back">
+          <span className="category-badge" style={{ background: "#10b981" }}>Respuesta</span>
+          <p style={{ fontSize: "16px" }}>{answer}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PDFUploader() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -14,10 +36,8 @@ export default function PDFUploader() {
     try {
       const res = await fetch("/api/pdf", {
         method: "POST",
-        body: file, // Enviamos el archivo directamente como buffer binario
-        headers: {
-          "Content-Type": "application/pdf"
-        }
+        body: file,
+        headers: { "Content-Type": "application/pdf" }
       });
       const data = await res.json();
       if (res.ok) {
@@ -44,7 +64,8 @@ export default function PDFUploader() {
         padding: "40px",
         textAlign: "center",
         marginBottom: "24px",
-        background: file ? "rgba(99, 102, 241, 0.05)" : "transparent"
+        background: file ? "rgba(99, 102, 241, 0.05)" : "transparent",
+        transition: "all 0.3s ease"
       }}>
         <input
           id="pdf-upload"
@@ -53,51 +74,61 @@ export default function PDFUploader() {
           onChange={(e) => setFile(e.target.files[0])}
           style={{ display: "none" }}
         />
-        <label htmlFor="pdf-upload" style={{ cursor: "pointer" }}>
-          <div style={{ fontSize: "40px", marginBottom: "12px" }}>{file ? "📄" : "☁️"}</div>
-          <p style={{ fontWeight: "500" }}>{file ? file.name : "Hacer click para seleccionar PDF"}</p>
+        <label htmlFor="pdf-upload" style={{ cursor: "pointer", display: "block" }}>
+          <div style={{ fontSize: "48px", marginBottom: "12px" }}>{file ? "📄" : "☁️"}</div>
+          <p style={{ fontWeight: "600", fontSize: "18px" }}>{file ? file.name : "Soltar PDF o hacer clic"}</p>
+          <p style={{ color: "var(--text-muted)", fontSize: "14px", marginTop: "4px" }}>Máximo 10MB</p>
         </label>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <button
-          onClick={uploadPDF}
-          disabled={loading || !file}
-          style={{
-            background: "var(--primary)",
-            color: "white",
-            border: "none",
-            padding: "12px 28px",
-            borderRadius: "12px",
-            fontWeight: "600",
-            flex: 1
-          }}
-        >
-          {loading ? "Procesando con AI..." : "Generar Resumen & Flashcards"}
-        </button>
-      </div>
-      {error && <p style={{ color: "#ef4444", marginTop: "12px", fontSize: "14px" }}>{error}</p>}
+      <button
+        onClick={uploadPDF}
+        disabled={loading || !file}
+        style={{
+          background: "var(--primary)",
+          color: "white",
+          border: "none",
+          padding: "16px 28px",
+          borderRadius: "12px",
+          fontWeight: "700",
+          width: "100%",
+          fontSize: "16px",
+          boxShadow: "0 4px 14px 0 rgba(99, 102, 241, 0.39)"
+        }}
+      >
+        {loading ? "Procesando con Magia AI..." : "Generar Estudio Inteligente"}
+      </button>
+
+      {error && <p style={{ color: "#ef4444", marginTop: "16px", textAlign: "center", fontWeight: "500" }}>{error}</p>}
 
       {result && (
-        <div style={{ marginTop: "32px", animation: "fadeIn 0.5s ease" }}>
-          <h3 style={{ fontSize: "18px", fontWeight: "600", marginBottom: "12px" }}>Resumen</h3>
-          <p style={{ background: "rgba(255,255,255,0.03)", padding: "20px", borderRadius: "12px", border: "1px solid var(--card-border)", marginBottom: "24px" }}>
+        <div style={{ marginTop: "40px", animation: "fadeIn 0.5s ease" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <h3 style={{ fontSize: "20px", fontWeight: "700" }}>🎯 Resumen Consolidado</h3>
+            <button style={{ background: "transparent", border: "1px solid var(--card-border)", color: "white", padding: "6px 12px", borderRadius: "8px", fontSize: "12px" }}>
+              Copiar Resumen
+            </button>
+          </div>
+          <p style={{
+            background: "rgba(255,255,255,0.03)",
+            padding: "24px",
+            borderRadius: "16px",
+            border: "1px solid var(--card-border)",
+            lineHeight: "1.7",
+            color: "#e2e8f0",
+            marginBottom: "40px"
+          }}>
             {result.summary}
           </p>
 
-          <h3 style={{ fontSize: "18px", fontWeight: "600", marginBottom: "16px" }}>Flashcards</h3>
-          <div style={{ display: "grid", gap: "16px" }}>
+          <h3 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "20px" }}>🗂️ Flashcards de Estudio</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
             {Array.isArray(result.flashcards) && result.flashcards.length > 0 ? (
               result.flashcards.map((card, i) => (
-                <div key={i} className="glass-card" style={{ padding: "16px", background: "rgba(255,255,255,0.02)" }}>
-                  <p style={{ fontWeight: "600", color: "var(--primary)", fontSize: "14px", textTransform: "uppercase", marginBottom: "4px" }}>Pregunta</p>
-                  <p style={{ fontWeight: "500", marginBottom: "12px" }}>{card.question}</p>
-                  <p style={{ fontWeight: "600", color: "#10b981", fontSize: "14px", textTransform: "uppercase", marginBottom: "4px" }}>Respuesta</p>
-                  <p style={{ color: "var(--text-muted)" }}>{card.answer}</p>
-                </div>
+                <Flashcard key={i} question={card.question} answer={card.answer} />
               ))
             ) : (
-              <p style={{ color: "var(--text-muted)" }}>No se detectaron flashcards.</p>
+              <p style={{ color: "var(--text-muted)", gridColumn: "span 2" }}>No se detectaron conceptos para flashcards.</p>
             )}
           </div>
         </div>
