@@ -1,6 +1,8 @@
 import { useState } from "react";
+import SummarizeForm from "../components/SummarizeForm";
 
 export default function Home() {
+
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
@@ -8,6 +10,7 @@ export default function Home() {
     e.preventDefault();
 
     try {
+
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: {
@@ -24,6 +27,7 @@ export default function Home() {
       } else {
         setMessage("Error saving email");
       }
+
     } catch (error) {
       setMessage("Server error");
     }
@@ -31,10 +35,12 @@ export default function Home() {
 
   return (
     <div style={{ fontFamily: "Arial", textAlign: "center", padding: "100px" }}>
+
       <h1>StudyMind AI</h1>
       <p>The AI that studies for you</p>
 
       <form onSubmit={subscribe}>
+
         <input
           type="email"
           placeholder="Enter your email"
@@ -57,9 +63,15 @@ export default function Home() {
         >
           Join Waitlist
         </button>
+
       </form>
 
       <p>{message}</p>
+
+      <hr style={{ margin: "50px 0" }} />
+
+      <SummarizeForm />
+
     </div>
   );
 }
