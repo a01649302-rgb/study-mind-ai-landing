@@ -1,60 +1,29 @@
-import { useState } from "react";
+import { createClient } from "@supabase/supabase-js"
 
-export default function Home() {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
-  const subscribe = async (e) => {
-    e.preventDefault();
+export default async function handler(req, res) {
 
-    const res = await fetch("/api/subscribe", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" })
+  }
 
-    const data = await res.json();
+  const { email } = req.body
 
-    if (data.success) {
-      setMessage("You are on the waitlist 🚀");
-      setEmail("");
-    } else {
-      setMessage("Error saving email");
-    }
-  };
+  if (!email) {
+    return res.status(400).json({ error: "Email required" })
+  }
 
-  return (
-    <div style={{fontFamily:"Arial", textAlign:"center", padding:"100px"}}>
-      <h1>StudyMind AI</h1>
-      <p>The AI that studies for you</p>
+  const { data, error } = await supabase
+    .from("leads")
+    .insert([{ email }])
 
-      <form onSubmit={subscribe}>
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
-          required
-          style={{padding:"10px", width:"250px"}}
-        />
+  if (error) {
+    return res.status(500).json({ error: error.message })
+  }
 
-        <button
-          type="submit"
-          style={{
-            padding:"10px 20px",
-            marginLeft:"10px",
-            background:"black",
-            color:"white",
-            border:"none"
-          }}
-        >
-          Join Waitlist
-        </button>
-      </form>
-
-      <p>{message}</p>
-    </div>
-  );
+  return res.status(200).json({ success: true })
 }
